@@ -1,0 +1,40 @@
+   @Test
+	    void getEmployeeVo() throws Exception {
+	        List<EmployeeVo> employeeVoList = new ArrayList<>();
+	        employeeVoList.add(new EmployeeVo(1, "Arun", "arun@cg.com"));
+	        employeeVoList.add(new EmployeeVo(2, "Smith", "smith@cg.com"));
+
+	        when(employeeService.getEmployeeVo()).thenReturn(employeeVoList);
+
+	        mockMvc.perform(get("/empdetails/getEmployee"))
+	                .andExpect(status().isOk())
+	                .andExpect(jsonPath("$", hasSize(2)));
+	                
+	    }
+
+	    @Test
+	    void getEmployeeById() throws Exception {
+	        int employeeId = 1;
+	        EmployeeVo employeeVo = new EmployeeVo(1, "Arun", "arun@cg.com");
+
+	        when(employeeService.getEmployeeById(employeeId)).thenReturn(employeeVo);
+
+	        mockMvc.perform(get("/empdetails/getEmployeeById/1", employeeId))
+	                .andExpect(status().isOk())
+	                .andExpect(jsonPath("$",hasSize(1)));
+	       
+	    }
+
+	    @Test
+	    void healthcheck() throws Exception {
+	        int employeeId = 1;
+	        HealthCheck healthCheck = new HealthCheck("Checking for employee data", "Success", "Data found in the database");
+
+	        when(employeeService.healthcheck(employeeId)).thenReturn(healthCheck);
+
+	        mockMvc.perform(get("/empdetails/healthcheck/{employeeId}", employeeId))
+	                .andExpect(status().isOk())
+	                .andExpect(jsonPath("$.healthComment").value("Checking for employee data"))
+	                .andExpect(jsonPath("$.codeStatus").value("Success"))
+	                .andExpect(jsonPath("$.healthDescription").value("Data found in the database"));
+	    }
